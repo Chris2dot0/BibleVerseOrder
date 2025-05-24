@@ -13,7 +13,10 @@
         
         <div class="input-section">
             <textarea id="verseInput" placeholder="Enter verses here (e.g., John 3:16, Genesis 1:1, Revelation 22:21)"></textarea>
-            <button onclick="sortVerses()">Sort Verses</button>
+            <div class="button-container">
+                <button onclick="sortVerses()">Sort Verses</button>
+                <button onclick="resetForm()" class="reset-button">Reset</button>
+            </div>
         </div>
 
         <div class="output-section">

@@ -83,4 +83,9 @@ function sortVerses() {
 
     const output = parsedVerses.map(v => v.original).join('\n');
     document.getElementById('sortedVerses').textContent = output;
+}
+
+function resetForm() {
+    document.getElementById('verseInput').value = '';
+    document.getElementById('sortedVerses').textContent = '';
 } 
