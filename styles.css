@@ -76,6 +76,20 @@ button:hover {
     background-color: #c0392b;
 }
 
+.message-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 5px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    display: none;
+}
+
+.message-section.show {
+    display: block;
+}
+
 .output-section {
     background-color: #f8f9fa;
     padding: 1.5rem;

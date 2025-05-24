@@ -66,11 +66,43 @@ function parseVerse(verse) {
     };
 }
 
+function showMessage(message) {
+    const messageSection = document.getElementById('messageSection');
+    messageSection.textContent = message;
+    messageSection.classList.add('show');
+}
+
+function hideMessage() {
+    const messageSection = document.getElementById('messageSection');
+    messageSection.textContent = '';
+    messageSection.classList.remove('show');
+}
+
 function sortVerses() {
     const input = document.getElementById('verseInput').value;
     const verses = input.split(/[\n,]+/).map(v => v.trim()).filter(v => v);
     
-    const parsedVerses = verses.map(parseVerse).filter(v => v !== null);
+    // Find duplicates
+    const uniqueVerses = new Set();
+    const duplicates = new Set();
+    
+    verses.forEach(verse => {
+        if (uniqueVerses.has(verse)) {
+            duplicates.add(verse);
+        } else {
+            uniqueVerses.add(verse);
+        }
+    });
+
+    // Show message if duplicates were found
+    if (duplicates.size > 0) {
+        const duplicateList = Array.from(duplicates).join('\n');
+        showMessage(`Removed ${duplicates.size} duplicate verse(s):\n${duplicateList}`);
+    } else {
+        hideMessage();
+    }
+    
+    const parsedVerses = Array.from(uniqueVerses).map(parseVerse).filter(v => v !== null);
     
     parsedVerses.sort((a, b) => {
         const bookA = getBookIndex(a.bookName);
@@ -88,4 +120,5 @@ function sortVerses() {
 function resetForm() {
     document.getElementById('verseInput').value = '';
     document.getElementById('sortedVerses').textContent = '';
+    hideMessage();
 } 
