@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Verse Sorter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bible Verse Sorter</h1>
+        <p class="instructions">Enter Bible verses (one per line) in any order. They will be sorted from Revelation to Genesis.</p>
+        
+        <div class="input-section">
+            <textarea id="verseInput" placeholder="Enter verses here (e.g., John 3:16, Genesis 1:1, Revelation 22:21)"></textarea>
+            <button onclick="sortVerses()">Sort Verses</button>
+        </div>
+
+        <div class="output-section">
+            <h2>Sorted Verses (Revelation to Genesis)</h2>
+            <div id="sortedVerses"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
