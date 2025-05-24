@@ -49,71 +49,127 @@ function getBookIndex(bookName) {
     return bibleBooks.indexOf(normalizedBookName);
 }
 
-function parseVerse(verse) {
-    // Split the verse into book and chapter:verse
-    const match = verse.match(/^(.+?)\s+(\d+):(\d+)$/);
-    if (!match) return null;
+function parseEntry(entry) {
+    entry = entry.trim();
 
-    const bookName = match[1].trim();
-    const chapter = parseInt(match[2]);
-    const verseNum = parseInt(match[3]);
+    // Try to parse as a full verse (book chapter:verse)
+    const verseMatch = entry.match(/^(.+?)\s+(\d+):(\d+)$/);
+    if (verseMatch) {
+        const bookName = verseMatch[1].trim();
+        const chapter = parseInt(verseMatch[2]);
+        const verseNum = parseInt(verseMatch[3]);
 
-    return {
-        bookName,
-        chapter,
-        verse: verseNum,
-        original: verse
-    };
+        if (getBookIndex(bookName) === -1) {
+            return { error: `Invalid book name in entry: ${entry}` };
+        }
+
+        return {
+            type: 'verse',
+            bookName,
+            chapter,
+            verse: verseNum,
+            original: entry
+        };
+    }
+
+    // If not a full verse, check if it's a valid book name alone
+    const bookName = entry;
+    if (getBookIndex(bookName) !== -1) {
+        return {
+            type: 'book',
+            bookName,
+            original: entry
+        };
+    }
+
+    // If it's neither a valid verse nor a valid book name, it's an error
+    return { error: `Invalid entry format or book name: ${entry}` };
 }
 
-function showMessage(message) {
+function showMessage(message, isError = false) {
     const messageSection = document.getElementById('messageSection');
     messageSection.textContent = message;
     messageSection.classList.add('show');
+    if (isError) {
+        messageSection.classList.add('error');
+    } else {
+        messageSection.classList.remove('error');
+    }
 }
 
 function hideMessage() {
     const messageSection = document.getElementById('messageSection');
     messageSection.textContent = '';
-    messageSection.classList.remove('show');
+    messageSection.classList.remove('show', 'error');
 }
 
 function sortVerses() {
     const input = document.getElementById('verseInput').value;
-    const verses = input.split(/[\n,]+/).map(v => v.trim()).filter(v => v);
-    
+    const entries = input.split(/[\n,]+/).map(v => v.trim()).filter(v => v);
+
     // Find duplicates
-    const uniqueVerses = new Set();
+    const uniqueEntries = new Set();
     const duplicates = new Set();
-    
-    verses.forEach(verse => {
-        if (uniqueVerses.has(verse)) {
-            duplicates.add(verse);
+
+    entries.forEach(entry => {
+        if (uniqueEntries.has(entry)) {
+            duplicates.add(entry);
         } else {
-            uniqueVerses.add(verse);
+            uniqueEntries.add(entry);
         }
     });
 
-    // Show message if duplicates were found
+    // Parse entries and collect errors and valid parsed entries
+    const parsedEntries = [];
+    const errors = [];
+
+    Array.from(uniqueEntries).forEach(entry => {
+        const parsed = parseEntry(entry);
+        if (parsed.error) {
+            errors.push(parsed.error);
+        } else {
+            parsedEntries.push(parsed);
+        }
+    });
+
+    // Show messages
+    let message = '';
     if (duplicates.size > 0) {
-        const duplicateList = Array.from(duplicates).join('\n');
-        showMessage(`Removed ${duplicates.size} duplicate verse(s):\n${duplicateList}`);
+        message += `Removed ${duplicates.size} duplicate entry(s):\n${Array.from(duplicates).join('\n')}\n\n`;
+    }
+    if (errors.length > 0) {
+        message += `Invalid entries:\n${errors.join('\n')}`;
+        showMessage(message, true);
+        document.getElementById('sortedVerses').textContent = ''; // Clear previous results on error
+        return;
+    } else if (duplicates.size > 0) {
+        showMessage(message);
     } else {
         hideMessage();
     }
-    
-    const parsedVerses = Array.from(uniqueVerses).map(parseVerse).filter(v => v !== null);
-    
-    parsedVerses.sort((a, b) => {
-        const bookA = getBookIndex(a.bookName);
-        const bookB = getBookIndex(b.bookName);
-        
-        if (bookA !== bookB) return bookA - bookB;
-        if (a.chapter !== b.chapter) return b.chapter - a.chapter;
-        return b.verse - a.verse;
+
+    // Sort entries
+    parsedEntries.sort((a, b) => {
+        const bookAIndex = getBookIndex(a.bookName);
+        const bookBIndex = getBookIndex(b.bookName);
+
+        if (bookAIndex !== bookBIndex) return bookAIndex - bookBIndex;
+
+        // If both are verses, sort by chapter and verse
+        if (a.type === 'verse' && b.type === 'verse') {
+            if (a.chapter !== b.chapter) return b.chapter - a.chapter;
+            return b.verse - a.verse;
+        }
+
+        // If one is a book and one is a verse of the same book, put the book first
+        if (a.type === 'book' && b.type === 'verse') return -1;
+        if (a.type === 'verse' && b.type === 'book') return 1;
+
+        // If both are books of the same name (shouldn't happen with unique entries, but for completeness)
+        return 0;
     });
 
-    const output = parsedVerses.map(v => v.original).join('\n');
+    const output = parsedEntries.map(v => v.original).join('\n');
     document.getElementById('sortedVerses').textContent = output;
 }
 

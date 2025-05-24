@@ -84,10 +84,18 @@ button:hover {
     border: 1px solid #ffeeba;
     color: #856404;
     display: none;
+    white-space: pre-wrap;
+    font-family: monospace;
 }
 
 .message-section.show {
     display: block;
+}
+
+.message-section.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
 }
 
 .output-section {
