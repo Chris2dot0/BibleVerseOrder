@@ -14,7 +14,7 @@ const bibleBooks = [
 ];
 
 function getBookIndex(bookName) {
-    // Handle common variations in book names
+    // Handle common variations in book names and convert to lowercase for case-insensitive comparison
     const normalizedBookName = bookName.trim()
         .replace(/^1\s+/, '1 ')
         .replace(/^2\s+/, '2 ')
@@ -44,9 +44,11 @@ function getBookIndex(bookName) {
         .replace(/^Zeph$/, 'Zephaniah')
         .replace(/^Hag$/, 'Haggai')
         .replace(/^Zech$/, 'Zechariah')
-        .replace(/^Mal$/, 'Malachi');
+        .replace(/^Mal$/, 'Malachi')
+        .toLowerCase(); // Convert the normalized input to lowercase
 
-    return bibleBooks.indexOf(normalizedBookName);
+    // Use findIndex for case-insensitive comparison against the bibleBooks array
+    return bibleBooks.findIndex(book => book.toLowerCase() === normalizedBookName);
 }
 
 function parseEntry(entry) {
