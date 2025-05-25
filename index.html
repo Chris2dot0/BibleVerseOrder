@@ -14,7 +14,8 @@
         <div class="input-section">
             <textarea id="verseInput" placeholder="Enter verses here (e.g., John 3:16, Genesis 1:1, Revelation 22:21)"></textarea>
             <div class="button-container">
-                <button onclick="sortVerses()">Sort Verses</button>
+                <button onclick="sortVerses('reverse')">Sort Reverse Order</button>
+                <button onclick="sortVerses('normal')">Sort Normal Order</button>
                 <button onclick="resetForm()" class="reset-button">Reset</button>
             </div>
         </div>
@@ -22,7 +23,7 @@
         <div class="message-section" id="messageSection"></div>
 
         <div class="output-section">
-            <h2>Sorted Verses (Revelation to Genesis)</h2>
+            <h2 id="outputTitle">Sorted Verses</h2>
             <div id="sortedVerses"></div>
         </div>
     </div>

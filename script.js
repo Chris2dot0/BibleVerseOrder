@@ -103,7 +103,7 @@ function hideMessage() {
     messageSection.classList.remove('show', 'error');
 }
 
-function sortVerses() {
+function sortVerses(order = 'reverse') {
     const input = document.getElementById('verseInput').value;
     const entries = input.split(/[\n,]+/).map(v => v.trim()).filter(v => v);
 
@@ -148,17 +148,33 @@ function sortVerses() {
         hideMessage();
     }
 
+    // Update output title based on sort order
+    const outputTitle = document.getElementById('outputTitle');
+    outputTitle.textContent = order === 'reverse' ? 
+        'Sorted Verses (Revelation to Genesis)' : 
+        'Sorted Verses (Genesis to Revelation)';
+
     // Sort entries
     parsedEntries.sort((a, b) => {
         const bookAIndex = getBookIndex(a.bookName);
         const bookBIndex = getBookIndex(b.bookName);
 
-        if (bookAIndex !== bookBIndex) return bookAIndex - bookBIndex;
+        if (bookAIndex !== bookBIndex) {
+            return order === 'reverse' ? 
+                bookAIndex - bookBIndex : 
+                bookBIndex - bookAIndex;
+        }
 
         // If both are verses, sort by chapter and verse
         if (a.type === 'verse' && b.type === 'verse') {
-            if (a.chapter !== b.chapter) return b.chapter - a.chapter;
-            return b.verse - a.verse;
+            if (a.chapter !== b.chapter) {
+                return order === 'reverse' ? 
+                    b.chapter - a.chapter : 
+                    a.chapter - b.chapter;
+            }
+            return order === 'reverse' ? 
+                b.verse - a.verse : 
+                a.verse - b.verse;
         }
 
         // If one is a book and one is a verse of the same book, put the book first
@@ -169,7 +185,13 @@ function sortVerses() {
         return 0;
     });
 
-    const output = parsedEntries.map(v => v.original).join('\n');
+    const output = parsedEntries.map(v => {
+        if (v.type === 'verse') {
+            return `${v.bookName} ${v.chapter}:${v.verse}`;
+        } else {
+            return v.bookName; // For entries of type 'book'
+        }
+    }).join('\n');
     document.getElementById('sortedVerses').textContent = output;
 }
 
