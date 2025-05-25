@@ -201,4 +201,26 @@ function resetForm() {
     document.getElementById('verseInput').value = '';
     document.getElementById('sortedVerses').textContent = '';
     hideMessage();
-} 
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    // Load saved preference from local storage
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+        body.classList.add(savedMode);
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+
+        // Save preference to local storage
+        if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('darkMode', 'dark-mode');
+        } else {
+            localStorage.removeItem('darkMode'); // or setItem('darkMode', '')
+        }
+    });
+}); 
